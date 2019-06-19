@@ -29,6 +29,10 @@ class Controller extends Package
 
     public function on_start()
     {
+        $this->app->bind(\Concrete\Package\CommunityStore\Controller\SinglePage\Checkout\Complete::class, function (\Concrete\Core\Application\Application $app, array $parameters) {
+        return $app->make(\Concrete\Package\HwCommunityStoreGoogleAnalytics\Src\Event\Order::class, $parameters);
+        });
+        
         // orders
         $orderlistener = Core::make('\Concrete\Package\HwCommunityStoreGoogleAnalytics\Src\Event\Order');
         Events::addListener('on_community_store_order', array($orderlistener, 'orderPlaced'));
