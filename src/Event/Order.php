@@ -3,14 +3,30 @@
 namespace Concrete\Package\HwCommunityStoreGoogleAnalytics\Src\Event;
 
 use Concrete\Package\CommunityStore\Src\CommunityStore\Utilities\Calculator as StoreCalculator;
+use Concrete\Package\CommunityStore\Controller\SinglePage\Checkout\Complete as StoreComplete;
 use Log;
 use Config;
-use view;
+use Page;
+use Core;
 use Concrete\Core\Support\Facade\Session;
-use Concrete\Core\Http\Client\Client;
 
-class Order
+class Order extends StoreComplete
 {
+
+    public function on_start()
+    {
+        $session = Core::make('app')->make('session');
+        if ($session->has('purchase_info')) {
+            $this->view->addFooterItem($session->get('purchase_info'));
+            $session->set('purchase_info', '');
+        };
+    }
+
+    /**
+     * @param \Concrete\Package\CommunityStore\Src\CommunityStore\Order\OrderEvent $event
+     *
+     * @return string
+     */
 
     public function orderPlaced($event)
     {
@@ -44,45 +60,39 @@ class Order
 //$order_details['products'] = $order_lines;
 
 
+        $purchase_info = "<script>";
 
-            $purchase_info = "<script>";
-
-            $purchase_info .= "gtag('event', 'purchase', {
+        $purchase_info .= "gtag('event', 'purchase', {
                     'transaction_id': '" . $order_details['order_id'] . "', 
                     'affiliation': '" . $order_details['store_name'] . "',
                     'value': '" . $order_details['total'] . "', 
                     'shipping': '" . $order_details['shipping'] . "' , 
                     'tax': '" . $order_details['tax'] . "', ";
 
-            //ADD INFO FOR EACH PRODUCT
+        //ADD INFO FOR EACH PRODUCT
 
 
-            $items = $order->getOrderItems();
+        $items = $order->getOrderItems();
 
         $purchase_info .= "'items': [";
-            foreach ($items as $item) {
-                $purchase_info .= "{
+        foreach ($items as $item) {
+            $purchase_info .= "{
                 'id': '" . $item->getSKU() . "',
                 'name': '" . $item->getProductName() . "', 
                 'brand': '',
                 'category': '', 
-                'quantity': '". $item->getQty() . "',
+                'quantity': '" . $item->getQty() . "',
                 'price': '" . number_format($item->getPricePaid(), 2, '.', '') . "'},";
 
-            }
-            //remove last comma
+        }
+        //remove last comma
         $purchase_info = rtrim($purchase_info, ",");
         $purchase_info .= ']});';
 
         $purchase_info .= '</script>';
 
-
         Session::set('purchase_info', $purchase_info);
 
     }
-
-
-
-
 
 }
