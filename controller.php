@@ -27,7 +27,7 @@ class Controller extends Package
     public function on_start()
     {
         $this->app->bind(\Concrete\Package\CommunityStore\Controller\SinglePage\Checkout\Complete::class, function (\Concrete\Core\Application\Application $app, array $parameters) {
-            return $app->make(\Concrete\Package\HwCommunityStoreGoogleAnalytics\Src\Event\Order::class, $parameters);
+            return $app->make(\Concrete\Package\HwCommunityStoreGoogleAnalytics\Src\Order::class, $parameters);
         });
 
 
