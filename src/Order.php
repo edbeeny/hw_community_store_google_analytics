@@ -15,7 +15,7 @@ class Order extends StoreComplete
         $customer = new StoreCustomer();
         $purchase_info = $this->orderPlaced($customer->getLastOrderID());
 
-        $this->view->addHeaderItem('<!--  Start of Google eCommerce tracking-->' . PHP_EOL . '<script>' . $purchase_info . '</script>' . PHP_EOL . '<!--  End of Google eCommerce tracking-->');
+        $this->view->addHeaderItem('<!--  Start of Google eCommerce tracking-->' . PHP_EOL . '<script>' . 'window.dataLayer = window.dataLayer || [];' . PHP_EOL . $purchase_info . '</script>' . PHP_EOL . '<!--  End of Google eCommerce tracking-->');
 
         return parent::view();
 
@@ -41,25 +41,24 @@ class Order extends StoreComplete
             $order_details['tax'] = number_format($totaltax, 2, '.', '');
             $order_details['shipping'] = number_format($order->getShippingTotal(), 2, '.', '');
 
-            $purchase_info = "gtag('event', 'purchase', {
-                    'transaction_id': '" . $order_details['order_id'] . "', 
-                    'affiliation': '" . $order_details['store_name'] . "',
-                    'value': '" . $order_details['total'] . "', 
-					'currency': 'GBP',
-                    'shipping': '" . $order_details['shipping'] . "', 
-                    'tax': '" . $order_details['tax'] . "', ";
+
+            $purchase_info = "dataLayer.push({
+                    'transactionId': '" . $order_details['order_id'] . "', 
+                    'transactionAffiliation': '" . $order_details['store_name'] . "',
+                    'transactionTotal': " . $order_details['total'] . ", 
+                    'transactionShipping': " . $order_details['shipping'] . ", 
+                    'transactionTax': " . $order_details['tax'] . ", ";
 
             $items = $order->getOrderItems();
-
-            $purchase_info .= "'items': [";
+            $purchase_info .= "'transactionProducts': [";
             foreach ($items as $item) {
                 $purchase_info .= "{
-                'id': '" . $item->getSKU() . "',
+                'sku': '" . $item->getSKU() . "',
                 'name': '" . $item->getProductName() . "', 
                 'brand': '',
                 'category': '', 
-                'quantity': '" . $item->getQty() . "',
-                'price': '" . number_format($item->getPricePaid(), 2, '.', '') . "'},";
+                'quantity': " . $item->getQty() . ",
+                'price': " . number_format($item->getPricePaid(), 2, '.', '') . "},";
 
             }
             //remove last comma
