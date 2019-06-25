@@ -8,7 +8,7 @@ class Controller extends Package
 {
     protected $pkgHandle = 'hw_community_store_google_analytics';
     protected $appVersionRequired = '5.7.1';
-    protected $pkgVersion = '0.9.1';
+    protected $pkgVersion = '0.9.2';
 
     public function getPackageDescription()
     {
