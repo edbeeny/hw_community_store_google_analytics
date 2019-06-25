@@ -44,7 +44,7 @@ class Order extends StoreComplete
 
             $purchase_info = "dataLayer.push({
                     'transactionId': '" . $order_details['order_id'] . "', 
-                    'transactionAffiliation': '" . $order_details['store_name'] . "',
+                    'transactionAffiliation': '" . addslashes($order_details['store_name']) . "',
                     'transactionTotal': " . $order_details['total'] . ", 
                     'transactionShipping': " . $order_details['shipping'] . ", 
                     'transactionTax': " . $order_details['tax'] . ", ";
@@ -53,8 +53,8 @@ class Order extends StoreComplete
             $purchase_info .= "'transactionProducts': [";
             foreach ($items as $item) {
                 $purchase_info .= "{
-                'sku': '" . $item->getSKU() . "',
-                'name': '" . $item->getProductName() . "', 
+                'sku': '" . addslashes($item->getSKU()) . "',
+                'name': '" . addslashes($item->getProductName()) . "', 
                 'brand': '',
                 'category': '', 
                 'quantity': " . $item->getQty() . ",
